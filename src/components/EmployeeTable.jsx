@@ -558,7 +558,7 @@ const EmployeeTable = ({ employees, onEdit, onDelete, onView, isDarkMode }) => {
                         Net Salary:
                       </span>
                       <span className="text-base font-bold text-indigo-600">
-                         {Number(employee.netSalary || 0).toLocaleString()}
+                        {Number(employee.netSalary || 0).toLocaleString()}
                       </span>
                     </div>
                   </div>

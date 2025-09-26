@@ -17,9 +17,11 @@ const Controls = ({
 }) => {
   const tabFilters = [
     { key: "all", label: "All", color: "indigo" },
-    { key: "advance", label: "Advance", color: "red" },
+    // { key: "advance", label: "Advance", color: "red" },
     { key: "commission", label: "Commission", color: "green" },
-    { key: "loan", label: "Loan", color: "purple" },
+    // { key: "loan", label: "Loan", color: "purple" },
+    { key: "remaining-advance", label: "Remaining Adv.", color: "orange" },
+    { key: "remaining-loan", label: "Remaining Loan", color: "yellow" },
   ];
 
   const dark = isDarkMode;
@@ -112,6 +114,21 @@ const Controls = ({
             </button>
           ))}
         </div>
+
+        {/* Current Date Display */}
+<div className={`text-center py-2 ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+  <span className="text-sm font-medium">
+    Current Date: {new Date().toLocaleDateString('en-US', { 
+      weekday: 'long', 
+      year: 'numeric', 
+      month: 'long', 
+      day: 'numeric' 
+    })} | {new Date().toLocaleTimeString('en-US', { 
+      hour: '2-digit', 
+      minute: '2-digit' 
+    })}
+  </span>
+</div>
 
         {/* Actions */}
         <div className="flex flex-wrap gap-2">
