@@ -1,7 +1,3 @@
-
-
-
-
 import React, { useState, useEffect } from "react";
 import { locations } from "../data/locations";
 import AdvanceManager from "./AdvanceManager";
@@ -40,6 +36,7 @@ const EmployeeForm = ({ employee, onSave, onCancel, isDarkMode }) => {
     commission: employee?.commission?.toString() || "",
     overtime: employee?.overtime?.toString() || "",
     cnic: employee?.cnic || "",
+    phoneNumber: employee?.phoneNumber || "",
     joiningDate: employee?.joiningDate || "",
     jobTitle: employee?.jobTitle || "",
   });
@@ -47,7 +44,9 @@ const EmployeeForm = ({ employee, onSave, onCancel, isDarkMode }) => {
   const [advances, setAdvances] = useState(
     (employee?.advances || []).map(normalizeAdvance)
   );
-  const [loans, setLoans] = useState((employee?.loans || []).map(normalizeLoan));
+  const [loans, setLoans] = useState(
+    (employee?.loans || []).map(normalizeLoan)
+  );
   const [netSalary, setNetSalary] = useState(0);
 
   // Real-time net salary calculation
@@ -65,20 +64,47 @@ const EmployeeForm = ({ employee, onSave, onCancel, isDarkMode }) => {
       0
     );
 
-    return basic + commission + overtime - totalAdvanceDeductions - totalLoanDeductions;
+    return (
+      basic +
+      commission +
+      overtime -
+      totalAdvanceDeductions -
+      totalLoanDeductions
+    );
   };
 
   // Update net salary whenever form data, advances, or loans change
   useEffect(() => {
     setNetSalary(calculateNetSalary());
-  }, [formData.basicSalary, formData.commission, formData.overtime, advances, loans]);
+  }, [
+    formData.basicSalary,
+    formData.commission,
+    formData.overtime,
+    advances,
+    loans,
+  ]);
+
+  // Add these two functions after getRemainingLoan
+  const getTotalRemainingAdvance = () => {
+    return advances.reduce(
+      (sum, adv) => sum + Number(adv.remainingAmount || 0),
+      0
+    );
+  };
+
+  const getTotalRemainingLoan = () => {
+    return loans.reduce(
+      (sum, loan) => sum + Number(loan.remainingAmount || 0),
+      0
+    );
+  };
 
   const addAdvance = () => {
     const newAdvance = {
       id: Date.now() + Math.random(),
       originalAmount: 0,
       remainingAmount: 0,
-      date: new Date().toISOString().split('T')[0],
+      date: new Date().toISOString().split("T")[0],
       reason: "",
       deduction: 0,
     };
@@ -89,22 +115,28 @@ const EmployeeForm = ({ employee, onSave, onCancel, isDarkMode }) => {
     setAdvances((prev) =>
       prev.map((a) => {
         if (a.id !== id) return a;
-        
+
         const updatedAdvance = { ...a };
-        
+
         if (field === "originalAmount") {
           const original = Number(value || 0);
           updatedAdvance.originalAmount = original;
-          updatedAdvance.remainingAmount = Math.max(0, original - Number(a.deduction || 0));
+          updatedAdvance.remainingAmount = Math.max(
+            0,
+            original - Number(a.deduction || 0)
+          );
         } else if (field === "deduction") {
           const ded = Number(value || 0);
           const maxDeduction = Number(a.originalAmount || 0);
           updatedAdvance.deduction = Math.min(ded, maxDeduction); // Prevent deduction > original
-          updatedAdvance.remainingAmount = Math.max(0, Number(a.originalAmount || 0) - updatedAdvance.deduction);
+          updatedAdvance.remainingAmount = Math.max(
+            0,
+            Number(a.originalAmount || 0) - updatedAdvance.deduction
+          );
         } else {
           updatedAdvance[field] = value;
         }
-        
+
         return updatedAdvance;
       })
     );
@@ -118,7 +150,7 @@ const EmployeeForm = ({ employee, onSave, onCancel, isDarkMode }) => {
       id: Date.now() + Math.random(),
       originalAmount: 0,
       remainingAmount: 0,
-      date: new Date().toISOString().split('T')[0],
+      date: new Date().toISOString().split("T")[0],
       reason: "",
       deduction: 0,
     };
@@ -129,22 +161,28 @@ const EmployeeForm = ({ employee, onSave, onCancel, isDarkMode }) => {
     setLoans((prev) =>
       prev.map((l) => {
         if (l.id !== id) return l;
-        
+
         const updatedLoan = { ...l };
-        
+
         if (field === "originalAmount") {
           const original = Number(value || 0);
           updatedLoan.originalAmount = original;
-          updatedLoan.remainingAmount = Math.max(0, original - Number(l.deduction || 0));
+          updatedLoan.remainingAmount = Math.max(
+            0,
+            original - Number(l.deduction || 0)
+          );
         } else if (field === "deduction") {
           const ded = Number(value || 0);
           const maxDeduction = Number(l.originalAmount || 0);
           updatedLoan.deduction = Math.min(ded, maxDeduction); // Prevent deduction > original
-          updatedLoan.remainingAmount = Math.max(0, Number(l.originalAmount || 0) - updatedLoan.deduction);
+          updatedLoan.remainingAmount = Math.max(
+            0,
+            Number(l.originalAmount || 0) - updatedLoan.deduction
+          );
         } else {
           updatedLoan[field] = value;
         }
-        
+
         return updatedLoan;
       })
     );
@@ -154,7 +192,7 @@ const EmployeeForm = ({ employee, onSave, onCancel, isDarkMode }) => {
     setLoans((prev) => prev.filter((l) => l.id !== id));
 
   const handleFormChange = (field, value) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
+    setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
   const handleSubmit = (e) => {
@@ -168,6 +206,8 @@ const EmployeeForm = ({ employee, onSave, onCancel, isDarkMode }) => {
       advances,
       loans,
       netSalary: netSalary,
+      remainingAdvance: getTotalRemainingAdvance(), // Add this line
+      remainingLoan: getTotalRemainingLoan(), // Add this line
       id: employee?.id || Date.now(),
       createdAt: employee?.createdAt || new Date().toISOString(),
       updatedAt: new Date().toISOString(),
@@ -187,9 +227,15 @@ const EmployeeForm = ({ employee, onSave, onCancel, isDarkMode }) => {
     const commission = Number(formData.commission || 0);
     const overtime = Number(formData.overtime || 0);
     const totalEarnings = basic + commission + overtime;
-    
-    const totalAdvanceDeductions = advances.reduce((s, a) => s + Number(a.deduction || 0), 0);
-    const totalLoanDeductions = loans.reduce((s, l) => s + Number(l.deduction || 0), 0);
+
+    const totalAdvanceDeductions = advances.reduce(
+      (s, a) => s + Number(a.deduction || 0),
+      0
+    );
+    const totalLoanDeductions = loans.reduce(
+      (s, l) => s + Number(l.deduction || 0),
+      0
+    );
     const totalDeductions = totalAdvanceDeductions + totalLoanDeductions;
 
     return {
@@ -197,7 +243,7 @@ const EmployeeForm = ({ employee, onSave, onCancel, isDarkMode }) => {
       totalAdvanceDeductions,
       totalLoanDeductions,
       totalDeductions,
-      netSalary
+      netSalary,
     };
   };
 
@@ -207,16 +253,26 @@ const EmployeeForm = ({ employee, onSave, onCancel, isDarkMode }) => {
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
       <form
         onSubmit={handleSubmit}
-        className={`${isDarkMode ? "bg-gray-800" : "bg-white"} rounded-xl shadow-xl p-6 w-full max-w-5xl max-h-[95vh] overflow-y-auto`}
+        className={`${
+          isDarkMode ? "bg-gray-800" : "bg-white"
+        } rounded-xl shadow-xl p-6 w-full max-w-5xl max-h-[95vh] overflow-y-auto`}
       >
         <div className="flex justify-between items-center mb-6">
-          <h2 className={`text-2xl font-bold ${isDarkMode ? "text-white" : "text-gray-800"}`}>
+          <h2
+            className={`text-2xl font-bold ${
+              isDarkMode ? "text-white" : "text-gray-800"
+            }`}
+          >
             {employee ? "Edit Employee" : "Add New Employee"}
           </h2>
           <button
             type="button"
             onClick={onCancel}
-            className={`${isDarkMode ? "text-gray-400 hover:text-gray-200" : "text-gray-500 hover:text-gray-700"} text-2xl hover:bg-gray-100 rounded-full w-8 h-8 flex items-center justify-center transition-colors`}
+            className={`${
+              isDarkMode
+                ? "text-gray-400 hover:text-gray-200"
+                : "text-gray-500 hover:text-gray-700"
+            } text-2xl hover:bg-gray-100 rounded-full w-8 h-8 flex items-center justify-center transition-colors`}
           >
             ×
           </button>
@@ -225,7 +281,11 @@ const EmployeeForm = ({ employee, onSave, onCancel, isDarkMode }) => {
         {/* Basic Information */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
           <div>
-            <label className={`block text-sm font-medium mb-1 ${isDarkMode ? "text-gray-300" : "text-gray-700"}`}>
+            <label
+              className={`block text-sm font-medium mb-1 ${
+                isDarkMode ? "text-gray-300" : "text-gray-700"
+              }`}
+            >
               Employee ID *
             </label>
             <input
@@ -233,12 +293,16 @@ const EmployeeForm = ({ employee, onSave, onCancel, isDarkMode }) => {
               placeholder="e.g. EMP001"
               className={inputStyle}
               value={formData.employeeId}
-              onChange={(e) => handleFormChange('employeeId', e.target.value)}
+              onChange={(e) => handleFormChange("employeeId", e.target.value)}
             />
           </div>
 
           <div>
-            <label className={`block text-sm font-medium mb-1 ${isDarkMode ? "text-gray-300" : "text-gray-700"}`}>
+            <label
+              className={`block text-sm font-medium mb-1 ${
+                isDarkMode ? "text-gray-300" : "text-gray-700"
+              }`}
+            >
               Employee Name *
             </label>
             <input
@@ -246,19 +310,23 @@ const EmployeeForm = ({ employee, onSave, onCancel, isDarkMode }) => {
               placeholder="Full name"
               className={inputStyle}
               value={formData.name}
-              onChange={(e) => handleFormChange('name', e.target.value)}
+              onChange={(e) => handleFormChange("name", e.target.value)}
             />
           </div>
 
           <div>
-            <label className={`block text-sm font-medium mb-1 ${isDarkMode ? "text-gray-300" : "text-gray-700"}`}>
+            <label
+              className={`block text-sm font-medium mb-1 ${
+                isDarkMode ? "text-gray-300" : "text-gray-700"
+              }`}
+            >
               Location *
             </label>
             <select
               required
               className={inputStyle}
               value={formData.location}
-              onChange={(e) => handleFormChange('location', e.target.value)}
+              onChange={(e) => handleFormChange("location", e.target.value)}
             >
               <option value="">Select Location</option>
               {locations.map((loc) => (
@@ -270,7 +338,11 @@ const EmployeeForm = ({ employee, onSave, onCancel, isDarkMode }) => {
           </div>
 
           <div>
-            <label className={`block text-sm font-medium mb-1 ${isDarkMode ? "text-gray-300" : "text-gray-700"}`}>
+            <label
+              className={`block text-sm font-medium mb-1 ${
+                isDarkMode ? "text-gray-300" : "text-gray-700"
+              }`}
+            >
               Job Title *
             </label>
             <input
@@ -278,12 +350,16 @@ const EmployeeForm = ({ employee, onSave, onCancel, isDarkMode }) => {
               placeholder="e.g. Software Developer"
               className={inputStyle}
               value={formData.jobTitle}
-              onChange={(e) => handleFormChange('jobTitle', e.target.value)}
+              onChange={(e) => handleFormChange("jobTitle", e.target.value)}
             />
           </div>
 
           <div>
-            <label className={`block text-sm font-medium mb-1 ${isDarkMode ? "text-gray-300" : "text-gray-700"}`}>
+            <label
+              className={`block text-sm font-medium mb-1 ${
+                isDarkMode ? "text-gray-300" : "text-gray-700"
+              }`}
+            >
               CNIC *
             </label>
             <input
@@ -291,12 +367,33 @@ const EmployeeForm = ({ employee, onSave, onCancel, isDarkMode }) => {
               placeholder="12345-1234567-1"
               className={inputStyle}
               value={formData.cnic}
-              onChange={(e) => handleFormChange('cnic', e.target.value)}
+              onChange={(e) => handleFormChange("cnic", e.target.value)}
             />
           </div>
 
           <div>
-            <label className={`block text-sm font-medium mb-1 ${isDarkMode ? "text-gray-300" : "text-gray-700"}`}>
+            <label
+              className={`block text-sm font-medium mb-1 ${
+                isDarkMode ? "text-gray-300" : "text-gray-700"
+              }`}
+            >
+              Phone Number *
+            </label>
+            <input
+              required
+              placeholder="e.g. 0300-1234567"
+              className={inputStyle}
+              value={formData.phoneNumber}
+              onChange={(e) => handleFormChange("phoneNumber", e.target.value)}
+            />
+          </div>
+
+          <div>
+            <label
+              className={`block text-sm font-medium mb-1 ${
+                isDarkMode ? "text-gray-300" : "text-gray-700"
+              }`}
+            >
               Joining Date *
             </label>
             <input
@@ -304,19 +401,33 @@ const EmployeeForm = ({ employee, onSave, onCancel, isDarkMode }) => {
               type="date"
               className={inputStyle}
               value={formData.joiningDate}
-              onChange={(e) => handleFormChange('joiningDate', e.target.value)}
+              onChange={(e) => handleFormChange("joiningDate", e.target.value)}
             />
           </div>
         </div>
 
         {/* Salary Information */}
-        <div className={`mb-6 p-4 border rounded-lg ${isDarkMode ? 'bg-gray-900 border-gray-700' : 'bg-gray-50 border-gray-200'}`}>
-          <h3 className={`text-lg font-semibold mb-4 ${isDarkMode ? 'text-white' : 'text-gray-800'}`}>
+        <div
+          className={`mb-6 p-4 border rounded-lg ${
+            isDarkMode
+              ? "bg-gray-900 border-gray-700"
+              : "bg-gray-50 border-gray-200"
+          }`}
+        >
+          <h3
+            className={`text-lg font-semibold mb-4 ${
+              isDarkMode ? "text-white" : "text-gray-800"
+            }`}
+          >
             Salary Information
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
-              <label className={`block text-sm font-medium mb-1 ${isDarkMode ? "text-gray-300" : "text-gray-700"}`}>
+              <label
+                className={`block text-sm font-medium mb-1 ${
+                  isDarkMode ? "text-gray-300" : "text-gray-700"
+                }`}
+              >
                 Basic Salary (PKR) *
               </label>
               <input
@@ -327,12 +438,18 @@ const EmployeeForm = ({ employee, onSave, onCancel, isDarkMode }) => {
                 placeholder="e.g. 50000"
                 className={inputStyle}
                 value={formData.basicSalary}
-                onChange={(e) => handleFormChange('basicSalary', e.target.value)}
+                onChange={(e) =>
+                  handleFormChange("basicSalary", e.target.value)
+                }
               />
             </div>
 
             <div>
-              <label className={`block text-sm font-medium mb-1 ${isDarkMode ? "text-gray-300" : "text-gray-700"}`}>
+              <label
+                className={`block text-sm font-medium mb-1 ${
+                  isDarkMode ? "text-gray-300" : "text-gray-700"
+                }`}
+              >
                 Commission (PKR)
               </label>
               <input
@@ -342,12 +459,16 @@ const EmployeeForm = ({ employee, onSave, onCancel, isDarkMode }) => {
                 placeholder="Optional"
                 className={inputStyle}
                 value={formData.commission}
-                onChange={(e) => handleFormChange('commission', e.target.value)}
+                onChange={(e) => handleFormChange("commission", e.target.value)}
               />
             </div>
 
             <div>
-              <label className={`block text-sm font-medium mb-1 ${isDarkMode ? "text-gray-300" : "text-gray-700"}`}>
+              <label
+                className={`block text-sm font-medium mb-1 ${
+                  isDarkMode ? "text-gray-300" : "text-gray-700"
+                }`}
+              >
                 Overtime Pay (PKR)
               </label>
               <input
@@ -357,7 +478,7 @@ const EmployeeForm = ({ employee, onSave, onCancel, isDarkMode }) => {
                 placeholder="Optional"
                 className={inputStyle}
                 value={formData.overtime}
-                onChange={(e) => handleFormChange('overtime', e.target.value)}
+                onChange={(e) => handleFormChange("overtime", e.target.value)}
               />
             </div>
           </div>
@@ -381,40 +502,78 @@ const EmployeeForm = ({ employee, onSave, onCancel, isDarkMode }) => {
         />
 
         {/* Real-time Salary Breakdown */}
-        <div className={`mt-6 p-4 border-2 rounded-lg ${
-          isDarkMode ? "bg-gradient-to-r from-green-900 to-blue-900 border-green-700" : "bg-gradient-to-r from-green-50 to-blue-50 border-green-200"
-        }`}>
-          <h3 className={`text-lg font-semibold mb-4 ${isDarkMode ? "text-white" : "text-gray-800"}`}>
+        <div
+          className={`mt-6 p-4 border-2 rounded-lg ${
+            isDarkMode
+              ? "bg-gradient-to-r from-green-900 to-blue-900 border-green-700"
+              : "bg-gradient-to-r from-green-50 to-blue-50 border-green-200"
+          }`}
+        >
+          <h3
+            className={`text-lg font-semibold mb-4 ${
+              isDarkMode ? "text-white" : "text-gray-800"
+            }`}
+          >
             Salary Breakdown
           </h3>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Earnings */}
             <div>
-              <h4 className={`text-sm font-medium mb-3 ${isDarkMode ? "text-green-300" : "text-green-800"}`}>
+              <h4
+                className={`text-sm font-medium mb-3 ${
+                  isDarkMode ? "text-green-300" : "text-green-800"
+                }`}
+              >
                 💰 Earnings
               </h4>
               <div className="space-y-2 text-sm">
                 <div className="flex justify-between">
-                  <span className={isDarkMode ? "text-gray-300" : "text-gray-700"}>Basic Salary:</span>
-                  <span className={`font-medium ${isDarkMode ? "text-white" : "text-gray-900"}`}>
+                  <span
+                    className={isDarkMode ? "text-gray-300" : "text-gray-700"}
+                  >
+                    Basic Salary:
+                  </span>
+                  <span
+                    className={`font-medium ${
+                      isDarkMode ? "text-white" : "text-gray-900"
+                    }`}
+                  >
                     PKR {Number(formData.basicSalary || 0).toLocaleString()}
                   </span>
                 </div>
                 <div className="flex justify-between">
-                  <span className={isDarkMode ? "text-gray-300" : "text-gray-700"}>Commission:</span>
+                  <span
+                    className={isDarkMode ? "text-gray-300" : "text-gray-700"}
+                  >
+                    Commission:
+                  </span>
                   <span className={`font-medium text-green-600`}>
                     PKR {Number(formData.commission || 0).toLocaleString()}
                   </span>
                 </div>
                 <div className="flex justify-between">
-                  <span className={isDarkMode ? "text-gray-300" : "text-gray-700"}>Overtime:</span>
+                  <span
+                    className={isDarkMode ? "text-gray-300" : "text-gray-700"}
+                  >
+                    Overtime:
+                  </span>
                   <span className={`font-medium text-blue-600`}>
                     PKR {Number(formData.overtime || 0).toLocaleString()}
                   </span>
                 </div>
-                <div className={`flex justify-between pt-2 border-t ${isDarkMode ? 'border-gray-600' : 'border-gray-300'}`}>
-                  <span className={`font-semibold ${isDarkMode ? "text-green-300" : "text-green-800"}`}>Total Earnings:</span>
+                <div
+                  className={`flex justify-between pt-2 border-t ${
+                    isDarkMode ? "border-gray-600" : "border-gray-300"
+                  }`}
+                >
+                  <span
+                    className={`font-semibold ${
+                      isDarkMode ? "text-green-300" : "text-green-800"
+                    }`}
+                  >
+                    Total Earnings:
+                  </span>
                   <span className={`font-bold text-green-600`}>
                     PKR {breakdown.totalEarnings.toLocaleString()}
                   </span>
@@ -424,24 +583,46 @@ const EmployeeForm = ({ employee, onSave, onCancel, isDarkMode }) => {
 
             {/* Deductions */}
             <div>
-              <h4 className={`text-sm font-medium mb-3 ${isDarkMode ? "text-red-300" : "text-red-800"}`}>
+              <h4
+                className={`text-sm font-medium mb-3 ${
+                  isDarkMode ? "text-red-300" : "text-red-800"
+                }`}
+              >
                 💸 Deductions
               </h4>
               <div className="space-y-2 text-sm">
                 <div className="flex justify-between">
-                  <span className={isDarkMode ? "text-gray-300" : "text-gray-700"}>Advance Deductions:</span>
+                  <span
+                    className={isDarkMode ? "text-gray-300" : "text-gray-700"}
+                  >
+                    Advance Deductions:
+                  </span>
                   <span className="font-medium text-red-600">
                     PKR {breakdown.totalAdvanceDeductions.toLocaleString()}
                   </span>
                 </div>
                 <div className="flex justify-between">
-                  <span className={isDarkMode ? "text-gray-300" : "text-gray-700"}>Loan Deductions:</span>
+                  <span
+                    className={isDarkMode ? "text-gray-300" : "text-gray-700"}
+                  >
+                    Loan Deductions:
+                  </span>
                   <span className="font-medium text-red-600">
                     PKR {breakdown.totalLoanDeductions.toLocaleString()}
                   </span>
                 </div>
-                <div className={`flex justify-between pt-2 border-t ${isDarkMode ? 'border-gray-600' : 'border-gray-300'}`}>
-                  <span className={`font-semibold ${isDarkMode ? "text-red-300" : "text-red-800"}`}>Total Deductions:</span>
+                <div
+                  className={`flex justify-between pt-2 border-t ${
+                    isDarkMode ? "border-gray-600" : "border-gray-300"
+                  }`}
+                >
+                  <span
+                    className={`font-semibold ${
+                      isDarkMode ? "text-red-300" : "text-red-800"
+                    }`}
+                  >
+                    Total Deductions:
+                  </span>
                   <span className="font-bold text-red-600">
                     PKR {breakdown.totalDeductions.toLocaleString()}
                   </span>
@@ -451,20 +632,38 @@ const EmployeeForm = ({ employee, onSave, onCancel, isDarkMode }) => {
           </div>
 
           {/* Net Salary */}
-          <div className={`mt-4 pt-4 border-t-2 ${isDarkMode ? 'border-gray-600' : 'border-gray-300'}`}>
+          <div
+            className={`mt-4 pt-4 border-t-2 ${
+              isDarkMode ? "border-gray-600" : "border-gray-300"
+            }`}
+          >
             <div className="flex justify-between items-center">
-              <span className={`text-xl font-bold ${isDarkMode ? "text-white" : "text-gray-900"}`}>
+              <span
+                className={`text-xl font-bold ${
+                  isDarkMode ? "text-white" : "text-gray-900"
+                }`}
+              >
                 💵 Net Salary:
               </span>
-              <span className={`text-2xl font-bold ${
-                netSalary >= 0 ? 'text-indigo-600' : 'text-red-600'
-              }`}>
+              <span
+                className={`text-2xl font-bold ${
+                  netSalary >= 0 ? "text-indigo-600" : "text-red-600"
+                }`}
+              >
                 PKR {Math.abs(netSalary).toLocaleString()}
-                {netSalary < 0 && <span className="text-sm ml-1">(Deficit)</span>}
+                {netSalary < 0 && (
+                  <span className="text-sm ml-1">(Deficit)</span>
+                )}
               </span>
             </div>
             {netSalary < 0 && (
-              <div className={`mt-2 p-2 rounded text-sm ${isDarkMode ? 'bg-red-900 text-red-200' : 'bg-red-100 text-red-800'}`}>
+              <div
+                className={`mt-2 p-2 rounded text-sm ${
+                  isDarkMode
+                    ? "bg-red-900 text-red-200"
+                    : "bg-red-100 text-red-800"
+                }`}
+              >
                 ⚠️ Warning: Deductions exceed total earnings
               </div>
             )}
@@ -477,9 +676,9 @@ const EmployeeForm = ({ employee, onSave, onCancel, isDarkMode }) => {
             type="submit"
             disabled={netSalary < 0}
             className={`flex-1 py-3 px-6 rounded-lg font-medium text-white transition-colors ${
-              netSalary < 0 
-                ? 'bg-gray-400 cursor-not-allowed' 
-                : 'bg-indigo-600 hover:bg-indigo-700 focus:ring-2 focus:ring-indigo-500'
+              netSalary < 0
+                ? "bg-gray-400 cursor-not-allowed"
+                : "bg-indigo-600 hover:bg-indigo-700 focus:ring-2 focus:ring-indigo-500"
             }`}
           >
             {employee ? "Update Employee" : "Save Employee"}
