@@ -20,8 +20,8 @@ const Controls = ({
     // { key: "advance", label: "Advance", color: "red" },
     { key: "commission", label: "Commission", color: "green" },
     // { key: "loan", label: "Loan", color: "purple" },
-    { key: "remaining-advance", label: "Remaining Adv.", color: "orange" },
-    { key: "remaining-loan", label: "Remaining Loan", color: "yellow" },
+    { key: "remaining-advance", label: "Remaining Adv.", color: "red" },
+    { key: "remaining-loan", label: "Remaining Loan", color: "purple"  },
   ];
 
   const dark = isDarkMode;
