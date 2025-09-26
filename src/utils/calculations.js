@@ -46,4 +46,34 @@ export function monthlyPayrollRecord(employee, year, month) {
   };
 }
 
+// Helper function to calculate monthly payroll
+export const calculateMonthlyPayroll = (employee, year, month) => {
+  const basic = Number(employee.basicSalary || 0);
+  const commission = Number(employee.commission || 0);
+  const overtime = Number(employee.overtime || 0);
+  const gross = basic + commission + overtime;
+
+  const advanceDeductions = (employee.advances || []).reduce((sum, adv) => 
+    sum + Number(adv.deduction || 0), 0
+  );
+  
+  const loanDeductions = (employee.loans || []).reduce((sum, loan) => 
+    sum + Number(loan.deduction || 0), 0
+  );
+
+  const net = gross - advanceDeductions - loanDeductions;
+
+  return {
+    employeeId: employee.employeeId,
+    employeeName: employee.name,
+    location: employee.location,
+    gross,
+    advanceDeductions,
+    loanDeductions,
+    totalDeductions: advanceDeductions + loanDeductions,
+    net,
+    month: `${new Date(year, month).toLocaleString('default', { month: 'long' })} ${year}`
+  };
+};
+
 

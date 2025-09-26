@@ -141,7 +141,7 @@ const EmployeeTable = ({ employees, onEdit, onDelete, onView, isDarkMode }) => {
       </div>
 
       {/* Mobile Card View */}
-      <div className="md:hidden">
+      <div className="md:hidden ">
         {employees.map((employee) => {
           const advanceDeductions = getAdvancesDeduction(employee.advances);
           const loanDeductions = getLoansDeduction(employee.loans);
@@ -149,7 +149,7 @@ const EmployeeTable = ({ employees, onEdit, onDelete, onView, isDarkMode }) => {
           return (
             <div 
               key={employee.id} 
-              className={`p-4 border-b ${isDarkMode ? 'border-gray-700' : 'border-gray-200'} last:border-b-0 cursor-pointer`} 
+              className={`p-4  border-b ${isDarkMode ? 'border-gray-700' : 'border-gray-200'} last:border-b-0 cursor-pointer mb-3 m-4 border rounded-[20px]`} 
               onClick={(e) => {
                 if (!e.target.closest('button') && onView) {
                   onView(employee);
