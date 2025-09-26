@@ -428,7 +428,7 @@ const EmployeeForm = ({ employee, onSave, onCancel, isDarkMode }) => {
                   isDarkMode ? "text-gray-300" : "text-gray-700"
                 }`}
               >
-                Basic Salary (PKR) *
+                Basic Salary (AED) *
               </label>
               <input
                 required
@@ -450,7 +450,7 @@ const EmployeeForm = ({ employee, onSave, onCancel, isDarkMode }) => {
                   isDarkMode ? "text-gray-300" : "text-gray-700"
                 }`}
               >
-                Commission (PKR)
+                Commission (AED)
               </label>
               <input
                 type="number"
@@ -469,7 +469,7 @@ const EmployeeForm = ({ employee, onSave, onCancel, isDarkMode }) => {
                   isDarkMode ? "text-gray-300" : "text-gray-700"
                 }`}
               >
-                Overtime Pay (PKR)
+                Overtime Pay (AED)
               </label>
               <input
                 type="number"
@@ -539,7 +539,7 @@ const EmployeeForm = ({ employee, onSave, onCancel, isDarkMode }) => {
                       isDarkMode ? "text-white" : "text-gray-900"
                     }`}
                   >
-                    PKR {Number(formData.basicSalary || 0).toLocaleString()}
+                    AED {Number(formData.basicSalary || 0).toLocaleString()}
                   </span>
                 </div>
                 <div className="flex justify-between">
@@ -549,7 +549,7 @@ const EmployeeForm = ({ employee, onSave, onCancel, isDarkMode }) => {
                     Commission:
                   </span>
                   <span className={`font-medium text-green-600`}>
-                    PKR {Number(formData.commission || 0).toLocaleString()}
+                    AED {Number(formData.commission || 0).toLocaleString()}
                   </span>
                 </div>
                 <div className="flex justify-between">
@@ -559,7 +559,7 @@ const EmployeeForm = ({ employee, onSave, onCancel, isDarkMode }) => {
                     Overtime:
                   </span>
                   <span className={`font-medium text-blue-600`}>
-                    PKR {Number(formData.overtime || 0).toLocaleString()}
+                    AED {Number(formData.overtime || 0).toLocaleString()}
                   </span>
                 </div>
                 <div
@@ -575,7 +575,7 @@ const EmployeeForm = ({ employee, onSave, onCancel, isDarkMode }) => {
                     Total Earnings:
                   </span>
                   <span className={`font-bold text-green-600`}>
-                    PKR {breakdown.totalEarnings.toLocaleString()}
+                    AED {breakdown.totalEarnings.toLocaleString()}
                   </span>
                 </div>
               </div>
@@ -598,7 +598,7 @@ const EmployeeForm = ({ employee, onSave, onCancel, isDarkMode }) => {
                     Advance Deductions:
                   </span>
                   <span className="font-medium text-red-600">
-                    PKR {breakdown.totalAdvanceDeductions.toLocaleString()}
+                    AED {breakdown.totalAdvanceDeductions.toLocaleString()}
                   </span>
                 </div>
                 <div className="flex justify-between">
@@ -608,7 +608,7 @@ const EmployeeForm = ({ employee, onSave, onCancel, isDarkMode }) => {
                     Loan Deductions:
                   </span>
                   <span className="font-medium text-red-600">
-                    PKR {breakdown.totalLoanDeductions.toLocaleString()}
+                    AED {breakdown.totalLoanDeductions.toLocaleString()}
                   </span>
                 </div>
                 <div
@@ -624,7 +624,7 @@ const EmployeeForm = ({ employee, onSave, onCancel, isDarkMode }) => {
                     Total Deductions:
                   </span>
                   <span className="font-bold text-red-600">
-                    PKR {breakdown.totalDeductions.toLocaleString()}
+                    AED {breakdown.totalDeductions.toLocaleString()}
                   </span>
                 </div>
               </div>
@@ -650,7 +650,7 @@ const EmployeeForm = ({ employee, onSave, onCancel, isDarkMode }) => {
                   netSalary >= 0 ? "text-indigo-600" : "text-red-600"
                 }`}
               >
-                PKR {Math.abs(netSalary).toLocaleString()}
+                AED {Math.abs(netSalary).toLocaleString()}
                 {netSalary < 0 && (
                   <span className="text-sm ml-1">(Deficit)</span>
                 )}

@@ -223,33 +223,33 @@ const EmployeeTable = ({ employees, onEdit, onDelete, onView, isDarkMode }) => {
                       isDarkMode ? "text-white" : "text-gray-900"
                     }`}
                   >
-                    PKR {Number(employee.basicSalary || 0).toLocaleString()}
+                    AED {Number(employee.basicSalary || 0).toLocaleString()}
                   </td>
                   <td className="px-4 py-4 whitespace-nowrap text-sm font-medium text-green-600">
-                    PKR {Number(employee.commission || 0).toLocaleString()}
+                    AED {Number(employee.commission || 0).toLocaleString()}
                   </td>
                   <td className="px-4 py-4 whitespace-nowrap text-sm font-medium text-blue-600">
-                    PKR {Number(employee.overtime || 0).toLocaleString()}
+                    AED {Number(employee.overtime || 0).toLocaleString()}
                   </td>
                   <td className="px-4 py-4 whitespace-nowrap text-sm font-medium text-red-600">
-                    PKR {advanceDeductions.toLocaleString()}
+                    AED {advanceDeductions.toLocaleString()}
                   </td>
 
                   <td className="px-4 py-4 whitespace-nowrap text-sm font-medium text-orange-600">
-                    PKR{" "}
+                    AED{" "}
                     {Number(employee.remainingAdvance || 0).toLocaleString()}
                   </td>
 
                   <td className="px-4 py-4 whitespace-nowrap text-sm font-medium text-red-600">
-                    PKR {loanDeductions.toLocaleString()}
+                    AED {loanDeductions.toLocaleString()}
                   </td>
 
                   <td className="px-4 py-4 whitespace-nowrap text-sm font-medium text-purple-600">
-                    PKR {Number(employee.remainingLoan || 0).toLocaleString()}
+                    AED {Number(employee.remainingLoan || 0).toLocaleString()}
                   </td>
 
                   <td className="px-4 py-4 whitespace-nowrap text-sm font-bold text-indigo-600">
-                    PKR {Number(employee.netSalary || 0).toLocaleString()}
+                    AED {Number(employee.netSalary || 0).toLocaleString()}
                   </td>
 
                   <td
@@ -422,31 +422,6 @@ const EmployeeTable = ({ employees, onEdit, onDelete, onView, isDarkMode }) => {
                     {employee.location || "N/A"}
                   </span>
                 </div>
-                <div>
-                  <span
-                    className={`${
-                      isDarkMode ? "text-gray-400" : "text-gray-600"
-                    }`}
-                  >
-                    Remaining Adv.:
-                  </span>
-                  <span className="ml-1 font-medium text-orange-600">
-                    PKR{" "}
-                    {Number(employee.remainingAdvance || 0).toLocaleString()}
-                  </span>
-                </div>
-                <div>
-                  <span
-                    className={`${
-                      isDarkMode ? "text-gray-400" : "text-gray-600"
-                    }`}
-                  >
-                    Remaining Loan:
-                  </span>
-                  <span className="ml-1 font-medium text-purple-600">
-                    PKR {Number(employee.remainingLoan || 0).toLocaleString()}
-                  </span>
-                </div>
 
                 <div>
                   <span
@@ -486,7 +461,7 @@ const EmployeeTable = ({ employees, onEdit, onDelete, onView, isDarkMode }) => {
                           isDarkMode ? "text-white" : "text-gray-900"
                         }`}
                       >
-                        PKR {Number(employee.basicSalary || 0).toLocaleString()}
+                        AED {Number(employee.basicSalary || 0).toLocaleString()}
                       </span>
                     </div>
                     <div>
@@ -498,7 +473,7 @@ const EmployeeTable = ({ employees, onEdit, onDelete, onView, isDarkMode }) => {
                         Commission:
                       </span>
                       <span className="ml-1 font-medium text-green-600">
-                        PKR {Number(employee.commission || 0).toLocaleString()}
+                        AED {Number(employee.commission || 0).toLocaleString()}
                       </span>
                     </div>
                     <div>
@@ -510,7 +485,7 @@ const EmployeeTable = ({ employees, onEdit, onDelete, onView, isDarkMode }) => {
                         Overtime:
                       </span>
                       <span className="ml-1 font-medium text-blue-600">
-                        PKR {Number(employee.overtime || 0).toLocaleString()}
+                        AED {Number(employee.overtime || 0).toLocaleString()}
                       </span>
                     </div>
                     <div>
@@ -522,9 +497,25 @@ const EmployeeTable = ({ employees, onEdit, onDelete, onView, isDarkMode }) => {
                         Advance Ded.:
                       </span>
                       <span className="ml-1 font-medium text-red-600">
-                        PKR {advanceDeductions.toLocaleString()}
+                        AED {advanceDeductions.toLocaleString()}
                       </span>
                     </div>
+                    <div>
+                      <span
+                        className={`${
+                          isDarkMode ? "text-gray-400" : "text-gray-600"
+                        }`}
+                      >
+                        Remaining Adv.:
+                      </span>
+                      <span className="ml-1 font-medium text-orange-600">
+                        AED{" "}
+                        {Number(
+                          employee.remainingAdvance || 0
+                        ).toLocaleString()}
+                      </span>
+                    </div>
+
                     <div>
                       <span
                         className={`${
@@ -534,7 +525,21 @@ const EmployeeTable = ({ employees, onEdit, onDelete, onView, isDarkMode }) => {
                         Loan Ded.:
                       </span>
                       <span className="ml-1 font-medium text-red-600">
-                        PKR {loanDeductions.toLocaleString()}
+                        AED {loanDeductions.toLocaleString()}
+                      </span>
+                    </div>
+
+                    <div>
+                      <span
+                        className={`${
+                          isDarkMode ? "text-gray-400" : "text-gray-600"
+                        }`}
+                      >
+                        Remaining Loan:
+                      </span>
+                      <span className="ml-1 font-medium text-purple-600">
+                        AED{" "}
+                        {Number(employee.remainingLoan || 0).toLocaleString()}
                       </span>
                     </div>
                   </div>
@@ -553,7 +558,7 @@ const EmployeeTable = ({ employees, onEdit, onDelete, onView, isDarkMode }) => {
                         Net Salary:
                       </span>
                       <span className="text-base font-bold text-indigo-600">
-                        PKR {Number(employee.netSalary || 0).toLocaleString()}
+                         {Number(employee.netSalary || 0).toLocaleString()}
                       </span>
                     </div>
                   </div>

@@ -1,90 +1,127 @@
+import React, { useState } from "react";
+import { Printer, Download, X, Calendar, User, CreditCard } from "lucide-react";
 
-
-import React, { useState } from 'react';
-import { Printer, Download, X, Calendar, User, CreditCard } from 'lucide-react';
-
-const ReceiptModal = ({ 
-  isDarkMode, 
-  open, 
-  onClose, 
-  employee, 
+const ReceiptModal = ({
+  isDarkMode,
+  open,
+  onClose,
+  employee,
   receiptData = {},
-  onSaveReceipt
+  onSaveReceipt,
 }) => {
-  const [receiptType, setReceiptType] = useState(receiptData.type || 'salary');
+  const [receiptType, setReceiptType] = useState(receiptData.type || "salary");
   const [customItems, setCustomItems] = useState(receiptData.items || []);
-  const [notes, setNotes] = useState(receiptData.notes || '');
+  const [notes, setNotes] = useState(receiptData.notes || "");
 
   if (!open || !employee) return null;
 
   const getReceiptItems = () => {
-    const currentDate = new Date().toISOString().split('T')[0];
-    
+    const currentDate = new Date().toISOString().split("T")[0];
+
     switch (receiptType) {
-      case 'salary':
+      case "salary":
         return [
-          { description: 'Basic Salary', amount: employee.basicSalary || 0, type: 'earning' },
-          { description: 'Commission', amount: employee.commission || 0, type: 'earning' },
-          { description: 'Overtime Pay', amount: employee.overtime || 0, type: 'earning' },
-          { description: 'Advance Deduction', amount: -(employee.advances?.reduce((sum, a) => sum + Number(a.deduction || 0), 0) || 0), type: 'deduction' },
-          { description: 'Loan Deduction', amount: -(employee.loans?.reduce((sum, l) => sum + Number(l.deduction || 0), 0) || 0), type: 'deduction' },
-        ].filter(item => item.amount !== 0);
-        
-      case 'advance':
-        return employee.advances?.map(adv => ({
-          description: `Advance: ${adv.reason || 'General'}`,
-          amount: adv.originalAmount || 0,
-          date: adv.date,
-          type: 'advance'
-        })) || [];
-        
-      case 'loan':
-        return employee.loans?.map(loan => ({
-          description: `Loan: ${loan.reason || 'General'}`,
-          amount: loan.originalAmount || 0,
-          date: loan.date,
-          type: 'loan'
-        })) || [];
-        
-      case 'custom':
+          {
+            description: "Basic Salary",
+            amount: employee.basicSalary || 0,
+            type: "earning",
+          },
+          {
+            description: "Commission",
+            amount: employee.commission || 0,
+            type: "earning",
+          },
+          {
+            description: "Overtime Pay",
+            amount: employee.overtime || 0,
+            type: "earning",
+          },
+          {
+            description: "Advance Deduction",
+            amount: -(
+              employee.advances?.reduce(
+                (sum, a) => sum + Number(a.deduction || 0),
+                0
+              ) || 0
+            ),
+            type: "deduction",
+          },
+          {
+            description: "Loan Deduction",
+            amount: -(
+              employee.loans?.reduce(
+                (sum, l) => sum + Number(l.deduction || 0),
+                0
+              ) || 0
+            ),
+            type: "deduction",
+          },
+        ].filter((item) => item.amount !== 0);
+
+      case "advance":
+        return (
+          employee.advances?.map((adv) => ({
+            description: `Advance: ${adv.reason || "General"}`,
+            amount: adv.originalAmount || 0,
+            date: adv.date,
+            type: "advance",
+          })) || []
+        );
+
+      case "loan":
+        return (
+          employee.loans?.map((loan) => ({
+            description: `Loan: ${loan.reason || "General"}`,
+            amount: loan.originalAmount || 0,
+            date: loan.date,
+            type: "loan",
+          })) || []
+        );
+
+      case "custom":
         return customItems;
-        
+
       default:
         return [];
     }
   };
 
   const addCustomItem = () => {
-    setCustomItems(prev => [...prev, { 
-      description: '', 
-      amount: 0, 
-      type: 'earning',
-      id: Date.now()
-    }]);
+    setCustomItems((prev) => [
+      ...prev,
+      {
+        description: "",
+        amount: 0,
+        type: "earning",
+        id: Date.now(),
+      },
+    ]);
   };
 
   const updateCustomItem = (id, field, value) => {
-    setCustomItems(prev => prev.map(item => 
-      item.id === id ? { ...item, [field]: value } : item
-    ));
+    setCustomItems((prev) =>
+      prev.map((item) => (item.id === id ? { ...item, [field]: value } : item))
+    );
   };
 
   const removeCustomItem = (id) => {
-    setCustomItems(prev => prev.filter(item => item.id !== id));
+    setCustomItems((prev) => prev.filter((item) => item.id !== id));
   };
 
   const items = getReceiptItems();
   const total = items.reduce((sum, item) => sum + Number(item.amount || 0), 0);
 
   const handlePrint = () => {
-    const printWindow = window.open('', '_blank');
+    const printWindow = window.open("", "_blank");
     const companyName = "Your Company Name"; // You can make this configurable
     const receiptNumber = `RCP-${Date.now()}`;
-    
+
     const html = `
       <html>
         <head>
-          <title>${receiptType.charAt(0).toUpperCase() + receiptType.slice(1)} Receipt - ${employee.name}</title>
+          <title>${
+            receiptType.charAt(0).toUpperCase() + receiptType.slice(1)
+          } Receipt - ${employee.name}</title>
           <style>
             body { 
               font-family: 'Arial', sans-serif; 
@@ -200,8 +237,8 @@ const ReceiptModal = ({
               <div class="label">Employee Details:</div>
               <div class="value">Name: ${employee.name}</div>
               <div class="value">ID: ${employee.employeeId}</div>
-              <div class="value">Position: ${employee.jobTitle || 'N/A'}</div>
-              <div class="value">CNIC: ${employee.cnic || 'N/A'}</div>
+              <div class="value">Position: ${employee.jobTitle || "N/A"}</div>
+              <div class="value">CNIC: ${employee.cnic || "N/A"}</div>
             </div>
             <div class="receipt-meta">
               <div class="label">Receipt Details:</div>
@@ -216,19 +253,29 @@ const ReceiptModal = ({
               <tr>
                 <th>Description</th>
                 <th>Type</th>
-                <th style="text-align: right;">Amount (PKR)</th>
+                <th style="text-align: right;">Amount (AED)</th>
               </tr>
             </thead>
             <tbody>
-              ${items.map(item => `
+              ${items
+                .map(
+                  (item) => `
                 <tr>
-                  <td>${item.description || 'N/A'}</td>
-                  <td style="text-transform: capitalize;">${item.type || 'Item'}</td>
-                  <td style="text-align: right;" class="${Number(item.amount) >= 0 ? 'amount-positive' : 'amount-negative'}">
+                  <td>${item.description || "N/A"}</td>
+                  <td style="text-transform: capitalize;">${
+                    item.type || "Item"
+                  }</td>
+                  <td style="text-align: right;" class="${
+                    Number(item.amount) >= 0
+                      ? "amount-positive"
+                      : "amount-negative"
+                  }">
                     ${Number(item.amount || 0).toLocaleString()}
                   </td>
                 </tr>
-              `).join('')}
+              `
+                )
+                .join("")}
               <tr class="total-row">
                 <td colspan="2">Net Total</td>
                 <td style="text-align: right;">${total.toLocaleString()}</td>
@@ -236,12 +283,16 @@ const ReceiptModal = ({
             </tbody>
           </table>
           
-          ${notes ? `
+          ${
+            notes
+              ? `
             <div class="notes">
               <div class="notes-title">Notes:</div>
               <div>${notes}</div>
             </div>
-          ` : ''}
+          `
+              : ""
+          }
           
           <div class="footer">
             <p>This is a system-generated receipt. Generated on ${new Date().toLocaleString()}</p>
@@ -250,7 +301,7 @@ const ReceiptModal = ({
         </body>
       </html>
     `;
-    
+
     printWindow.document.write(html);
     printWindow.document.close();
     printWindow.focus();
@@ -267,13 +318,13 @@ const ReceiptModal = ({
       total: total,
       notes: notes,
       date: new Date().toISOString(),
-      receiptNumber: `RCP-${Date.now()}`
+      receiptNumber: `RCP-${Date.now()}`,
     };
-    
+
     if (onSaveReceipt) {
       onSaveReceipt(receiptRecord);
     }
-    
+
     // Close modal after saving
     onClose();
   };
@@ -286,19 +337,39 @@ const ReceiptModal = ({
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-      <div className={`${isDarkMode ? 'bg-gray-800' : 'bg-white'} rounded-xl shadow-xl w-full max-w-4xl max-h-[95vh] overflow-y-auto`}>
+      <div
+        className={`${
+          isDarkMode ? "bg-gray-800" : "bg-white"
+        } rounded-xl shadow-xl w-full max-w-4xl max-h-[95vh] overflow-y-auto`}
+      >
         {/* Header */}
-        <div className={`sticky top-0 ${isDarkMode ? 'bg-gray-800' : 'bg-white'} border-b ${isDarkMode ? 'border-gray-700' : 'border-gray-200'} p-6`}>
+        <div
+          className={`sticky top-0 ${
+            isDarkMode ? "bg-gray-800" : "bg-white"
+          } border-b ${isDarkMode ? "border-gray-700" : "border-gray-200"} p-6`}
+        >
           <div className="flex justify-between items-center">
             <div className="flex items-center gap-3">
-              <CreditCard className={`w-6 h-6 ${isDarkMode ? 'text-indigo-400' : 'text-indigo-600'}`} />
-              <h2 className={`${isDarkMode ? 'text-white' : 'text-gray-800'} text-2xl font-bold`}>
+              <CreditCard
+                className={`w-6 h-6 ${
+                  isDarkMode ? "text-indigo-400" : "text-indigo-600"
+                }`}
+              />
+              <h2
+                className={`${
+                  isDarkMode ? "text-white" : "text-gray-800"
+                } text-2xl font-bold`}
+              >
                 Generate Receipt
               </h2>
             </div>
-            <button 
-              onClick={onClose} 
-              className={`${isDarkMode ? 'text-gray-400 hover:text-gray-200' : 'text-gray-500 hover:text-gray-700'} hover:bg-gray-100 rounded-full p-2 transition-colors`}
+            <button
+              onClick={onClose}
+              className={`${
+                isDarkMode
+                  ? "text-gray-400 hover:text-gray-200"
+                  : "text-gray-500 hover:text-gray-700"
+              } hover:bg-gray-100 rounded-full p-2 transition-colors`}
             >
               <X className="w-6 h-6" />
             </button>
@@ -307,34 +378,102 @@ const ReceiptModal = ({
 
         <div className="p-6">
           {/* Employee Info */}
-          <div className={`mb-6 p-4 rounded-lg border ${isDarkMode ? 'bg-gray-900 border-gray-700' : 'bg-gray-50 border-gray-200'}`}>
+          <div
+            className={`mb-6 p-4 rounded-lg border ${
+              isDarkMode
+                ? "bg-gray-900 border-gray-700"
+                : "bg-gray-50 border-gray-200"
+            }`}
+          >
             <div className="flex items-center gap-2 mb-3">
-              <User className={`w-5 h-5 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`} />
-              <h3 className={`font-semibold ${isDarkMode ? 'text-white' : 'text-gray-800'}`}>Employee Information</h3>
+              <User
+                className={`w-5 h-5 ${
+                  isDarkMode ? "text-gray-400" : "text-gray-600"
+                }`}
+              />
+              <h3
+                className={`font-semibold ${
+                  isDarkMode ? "text-white" : "text-gray-800"
+                }`}
+              >
+                Employee Information
+              </h3>
             </div>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
               <div>
-                <span className={`${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>Name:</span>
-                <div className={`font-medium ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{employee.name}</div>
+                <span
+                  className={`${
+                    isDarkMode ? "text-gray-400" : "text-gray-600"
+                  }`}
+                >
+                  Name:
+                </span>
+                <div
+                  className={`font-medium ${
+                    isDarkMode ? "text-white" : "text-gray-900"
+                  }`}
+                >
+                  {employee.name}
+                </div>
               </div>
               <div>
-                <span className={`${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>ID:</span>
-                <div className={`font-medium ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{employee.employeeId}</div>
+                <span
+                  className={`${
+                    isDarkMode ? "text-gray-400" : "text-gray-600"
+                  }`}
+                >
+                  ID:
+                </span>
+                <div
+                  className={`font-medium ${
+                    isDarkMode ? "text-white" : "text-gray-900"
+                  }`}
+                >
+                  {employee.employeeId}
+                </div>
               </div>
               <div>
-                <span className={`${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>Position:</span>
-                <div className={`font-medium ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{employee.jobTitle || 'N/A'}</div>
+                <span
+                  className={`${
+                    isDarkMode ? "text-gray-400" : "text-gray-600"
+                  }`}
+                >
+                  Position:
+                </span>
+                <div
+                  className={`font-medium ${
+                    isDarkMode ? "text-white" : "text-gray-900"
+                  }`}
+                >
+                  {employee.jobTitle || "N/A"}
+                </div>
               </div>
               <div>
-                <span className={`${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>Date:</span>
-                <div className={`font-medium ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{new Date().toLocaleDateString()}</div>
+                <span
+                  className={`${
+                    isDarkMode ? "text-gray-400" : "text-gray-600"
+                  }`}
+                >
+                  Date:
+                </span>
+                <div
+                  className={`font-medium ${
+                    isDarkMode ? "text-white" : "text-gray-900"
+                  }`}
+                >
+                  {new Date().toLocaleDateString()}
+                </div>
               </div>
             </div>
           </div>
 
           {/* Receipt Type Selection */}
           <div className="mb-6">
-            <label className={`block text-sm font-medium mb-2 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+            <label
+              className={`block text-sm font-medium mb-2 ${
+                isDarkMode ? "text-gray-300" : "text-gray-700"
+              }`}
+            >
               Receipt Type
             </label>
             <select
@@ -350,10 +489,16 @@ const ReceiptModal = ({
           </div>
 
           {/* Custom Items (for custom receipt type) */}
-          {receiptType === 'custom' && (
+          {receiptType === "custom" && (
             <div className="mb-6">
               <div className="flex justify-between items-center mb-3">
-                <h3 className={`font-semibold ${isDarkMode ? 'text-white' : 'text-gray-800'}`}>Custom Items</h3>
+                <h3
+                  className={`font-semibold ${
+                    isDarkMode ? "text-white" : "text-gray-800"
+                  }`}
+                >
+                  Custom Items
+                </h3>
                 <button
                   type="button"
                   onClick={addCustomItem}
@@ -363,17 +508,24 @@ const ReceiptModal = ({
                 </button>
               </div>
               {customItems.map((item) => (
-                <div key={item.id} className="grid grid-cols-1 md:grid-cols-4 gap-3 mb-3 p-3 border rounded">
+                <div
+                  key={item.id}
+                  className="grid grid-cols-1 md:grid-cols-4 gap-3 mb-3 p-3 border rounded"
+                >
                   <input
                     type="text"
                     placeholder="Description"
                     value={item.description}
-                    onChange={(e) => updateCustomItem(item.id, 'description', e.target.value)}
+                    onChange={(e) =>
+                      updateCustomItem(item.id, "description", e.target.value)
+                    }
                     className={inputStyle}
                   />
                   <select
                     value={item.type}
-                    onChange={(e) => updateCustomItem(item.id, 'type', e.target.value)}
+                    onChange={(e) =>
+                      updateCustomItem(item.id, "type", e.target.value)
+                    }
                     className={inputStyle}
                   >
                     <option value="earning">Earning</option>
@@ -383,7 +535,13 @@ const ReceiptModal = ({
                     type="number"
                     placeholder="Amount"
                     value={item.amount}
-                    onChange={(e) => updateCustomItem(item.id, 'amount', Number(e.target.value))}
+                    onChange={(e) =>
+                      updateCustomItem(
+                        item.id,
+                        "amount",
+                        Number(e.target.value)
+                      )
+                    }
                     className={inputStyle}
                   />
                   <button
@@ -400,7 +558,11 @@ const ReceiptModal = ({
 
           {/* Notes */}
           <div className="mb-6">
-            <label className={`block text-sm font-medium mb-2 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+            <label
+              className={`block text-sm font-medium mb-2 ${
+                isDarkMode ? "text-gray-300" : "text-gray-700"
+              }`}
+            >
               Notes (Optional)
             </label>
             <textarea
@@ -413,38 +575,79 @@ const ReceiptModal = ({
           </div>
 
           {/* Receipt Preview */}
-          <div className={`mb-6 border rounded-lg ${isDarkMode ? 'border-gray-700' : 'border-gray-200'}`}>
-            <div className={`px-4 py-3 border-b ${isDarkMode ? 'border-gray-700 bg-gray-900' : 'border-gray-200 bg-gray-50'}`}>
-              <h3 className={`font-semibold ${isDarkMode ? 'text-white' : 'text-gray-800'}`}>Receipt Preview</h3>
+          <div
+            className={`mb-6 border rounded-lg ${
+              isDarkMode ? "border-gray-700" : "border-gray-200"
+            }`}
+          >
+            <div
+              className={`px-4 py-3 border-b ${
+                isDarkMode
+                  ? "border-gray-700 bg-gray-900"
+                  : "border-gray-200 bg-gray-50"
+              }`}
+            >
+              <h3
+                className={`font-semibold ${
+                  isDarkMode ? "text-white" : "text-gray-800"
+                }`}
+              >
+                Receipt Preview
+              </h3>
             </div>
             <div className="p-4">
               {items.length > 0 ? (
                 <div className="overflow-x-auto">
                   <table className="min-w-full">
-                    <thead className={`${isDarkMode ? 'bg-gray-700 text-gray-200' : 'bg-gray-100 text-gray-700'}`}>
+                    <thead
+                      className={`${
+                        isDarkMode
+                          ? "bg-gray-700 text-gray-200"
+                          : "bg-gray-100 text-gray-700"
+                      }`}
+                    >
                       <tr>
                         <th className="px-3 py-2 text-left">Description</th>
                         <th className="px-3 py-2 text-left">Type</th>
-                        <th className="px-3 py-2 text-right">Amount (PKR)</th>
+                        <th className="px-3 py-2 text-right">Amount (AED)</th>
                       </tr>
                     </thead>
                     <tbody>
                       {items.map((item, idx) => (
-                        <tr key={idx} className={`border-b ${isDarkMode ? 'border-gray-700' : 'border-gray-200'}`}>
+                        <tr
+                          key={idx}
+                          className={`border-b ${
+                            isDarkMode ? "border-gray-700" : "border-gray-200"
+                          }`}
+                        >
                           <td className="px-3 py-2">{item.description}</td>
                           <td className="px-3 py-2 capitalize">{item.type}</td>
-                          <td className={`px-3 py-2 text-right font-medium ${
-                            Number(item.amount) >= 0 ? 'text-green-600' : 'text-red-600'
-                          }`}>
+                          <td
+                            className={`px-3 py-2 text-right font-medium ${
+                              Number(item.amount) >= 0
+                                ? "text-green-600"
+                                : "text-red-600"
+                            }`}
+                          >
                             {Number(item.amount || 0).toLocaleString()}
                           </td>
                         </tr>
                       ))}
-                      <tr className={`border-t-2 ${isDarkMode ? 'border-gray-600 bg-gray-700' : 'border-gray-300 bg-gray-50'}`}>
-                        <td className="px-3 py-3 font-bold" colSpan="2">Net Total</td>
-                        <td className={`px-3 py-3 text-right font-bold text-lg ${
-                          total >= 0 ? 'text-indigo-600' : 'text-red-600'
-                        }`}>
+                      <tr
+                        className={`border-t-2 ${
+                          isDarkMode
+                            ? "border-gray-600 bg-gray-700"
+                            : "border-gray-300 bg-gray-50"
+                        }`}
+                      >
+                        <td className="px-3 py-3 font-bold" colSpan="2">
+                          Net Total
+                        </td>
+                        <td
+                          className={`px-3 py-3 text-right font-bold text-lg ${
+                            total >= 0 ? "text-indigo-600" : "text-red-600"
+                          }`}
+                        >
                           {total.toLocaleString()}
                         </td>
                       </tr>
@@ -452,7 +655,11 @@ const ReceiptModal = ({
                   </table>
                 </div>
               ) : (
-                <div className={`text-center py-8 ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                <div
+                  className={`text-center py-8 ${
+                    isDarkMode ? "text-gray-400" : "text-gray-500"
+                  }`}
+                >
                   No items to display
                 </div>
               )}
@@ -479,8 +686,8 @@ const ReceiptModal = ({
               onClick={onClose}
               className={`flex-1 py-3 px-6 rounded-lg font-medium transition-colors ${
                 isDarkMode
-                  ? 'bg-gray-600 hover:bg-gray-700 text-gray-200'
-                  : 'bg-gray-300 hover:bg-gray-400 text-gray-700'
+                  ? "bg-gray-600 hover:bg-gray-700 text-gray-200"
+                  : "bg-gray-300 hover:bg-gray-400 text-gray-700"
               }`}
             >
               Cancel
