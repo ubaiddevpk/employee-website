@@ -380,12 +380,7 @@ const DashboardPage = ({
     }
   };
 
-  // const totalAdvance = employees.reduce((sum, emp) => sum + emp.advance, 0);
-  // const totalCommission = employees.reduce(
-  //   (sum, emp) => sum + emp.commission,
-  //   0
-  // );
-  // const totalLoan = employees.reduce((sum, emp) => sum + emp.visaLoan, 0);
+
 
   // Replace the existing totalAdvance, totalCommission, totalLoan calculations with:
   const totalAdvance = employees.reduce((sum, emp) => {
