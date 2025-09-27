@@ -1,5 +1,5 @@
 import { Search, Plus, FileText, FileSpreadsheet } from "lucide-react";
-import { locations } from "../data/locations";
+// import { locations } from "../data/locations";
 
 const Controls = ({
   searchTerm,
@@ -14,6 +14,7 @@ const Controls = ({
   exportToPDF,
   exportToExcel,
   isDarkMode,
+  employees, // Add this prop
 }) => {
   const tabFilters = [
     { key: "all", label: "All", color: "indigo" },
@@ -21,7 +22,7 @@ const Controls = ({
     { key: "commission", label: "Commission", color: "green" },
     // { key: "loan", label: "Loan", color: "purple" },
     { key: "remaining-advance", label: "Remaining Adv.", color: "red" },
-    { key: "remaining-loan", label: "Remaining Loan", color: "purple"  },
+    { key: "remaining-loan", label: "Remaining Loan", color: "purple" },
   ];
 
   const dark = isDarkMode;
@@ -71,7 +72,7 @@ const Controls = ({
           <option value="recent">Recent Hires</option>
         </select>
 
-        <select
+        {/* <select
           className={`${baseInput} min-w-[150px] ${
             dark
               ? "border-gray-600 bg-gray-700 text-white"
@@ -86,7 +87,35 @@ const Controls = ({
               {loc}
             </option>
           ))}
-        </select>
+        </select> */}
+
+        <select
+  className={`${baseInput} min-w-[150px] ${
+    dark
+      ? "border-gray-600 bg-gray-700 text-white"
+      : "border-gray-300 bg-white text-gray-900"
+  }`}
+  value={locationFilter}
+  onChange={(e) => setLocationFilter(e.target.value)}
+>
+  <option value="">All Locations</option>
+  {employees && employees.length > 0 
+    ? Array.from(new Set(
+        employees
+          .map(emp => emp.location)
+          .filter(location => location && location.trim())
+      )).map((loc) => (
+        <option key={loc} value={loc}>
+          {loc}
+        </option>
+      ))
+    : locations.map((loc) => (
+        <option key={loc} value={loc}>
+          {loc}
+        </option>
+      ))
+  }
+</select>
       </div>
 
       {/* ── Row 2 : Tabs + Actions ─────────────────────────────── */}
@@ -116,19 +145,26 @@ const Controls = ({
         </div>
 
         {/* Current Date Display */}
-<div className={`text-center py-2 ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
-  <span className="text-sm font-medium">
-    Current Date: {new Date().toLocaleDateString('en-US', { 
-      weekday: 'long', 
-      year: 'numeric', 
-      month: 'long', 
-      day: 'numeric' 
-    })} | {new Date().toLocaleTimeString('en-US', { 
-      hour: '2-digit', 
-      minute: '2-digit' 
-    })}
-  </span>
-</div>
+        <div
+          className={`text-center py-2 ${
+            isDarkMode ? "text-gray-300" : "text-gray-600"
+          }`}
+        >
+          <span className="text-sm font-medium">
+            Current Date:{" "}
+            {new Date().toLocaleDateString("en-US", {
+              weekday: "long",
+              year: "numeric",
+              month: "long",
+              day: "numeric",
+            })}{" "}
+            |{" "}
+            {new Date().toLocaleTimeString("en-US", {
+              hour: "2-digit",
+              minute: "2-digit",
+            })}
+          </span>
+        </div>
 
         {/* Actions */}
         <div className="flex flex-wrap gap-2">

@@ -587,6 +587,7 @@ const DashboardPage = ({
           exportToPDF={exportToPDF}
           exportToExcel={exportToExcel}
           isDarkMode={isDarkMode}
+           employees={employees}
         />
 
         {/* Employee Table */}

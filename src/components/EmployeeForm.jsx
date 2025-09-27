@@ -314,7 +314,7 @@ const EmployeeForm = ({ employee, onSave, onCancel, isDarkMode }) => {
             />
           </div>
 
-          <div>
+          {/* <div>
             <label
               className={`block text-sm font-medium mb-1 ${
                 isDarkMode ? "text-gray-300" : "text-gray-700"
@@ -335,7 +335,24 @@ const EmployeeForm = ({ employee, onSave, onCancel, isDarkMode }) => {
                 </option>
               ))}
             </select>
-          </div>
+          </div> */}
+
+          <div>
+  <label
+    className={`block text-sm font-medium mb-1 ${
+      isDarkMode ? "text-gray-300" : "text-gray-700"
+    }`}
+  >
+    Location *
+  </label>
+  <input
+    required
+    placeholder="e.g. Dubai, Abu Dhabi"
+    className={inputStyle}
+    value={formData.location}
+    onChange={(e) => handleFormChange("location", e.target.value)}
+  />
+</div>
 
           <div>
             <label
