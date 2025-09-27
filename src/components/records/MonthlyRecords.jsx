@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from "react";
 import { ChevronDown, ChevronUp, Calendar, TrendingUp } from "lucide-react";
 import { calculateMonthlyPayroll } from "../../utils/calculations";
+
 const MonthlyRecords = ({ isDarkMode, employees }) => {
   const now = new Date();
   const [year, setYear] = useState(now.getFullYear());
@@ -17,6 +18,10 @@ const MonthlyRecords = ({ isDarkMode, employees }) => {
       advanceDeductions: acc.advanceDeductions + record.advanceDeductions,
       loanDeductions: acc.loanDeductions + record.loanDeductions,
       totalDeductions: acc.totalDeductions + record.totalDeductions,
+      totalAdvanceTaken: acc.totalAdvanceTaken + (record.totalAdvanceTaken || 0),
+      totalLoanTaken: acc.totalLoanTaken + (record.totalLoanTaken || 0),
+      remainingAdvance: acc.remainingAdvance + (record.remainingAdvance || 0),
+      remainingLoan: acc.remainingLoan + (record.remainingLoan || 0),
       net: acc.net + record.net,
     }),
     {
@@ -24,6 +29,10 @@ const MonthlyRecords = ({ isDarkMode, employees }) => {
       advanceDeductions: 0,
       loanDeductions: 0,
       totalDeductions: 0,
+      totalAdvanceTaken: 0,
+      totalLoanTaken: 0,
+      remainingAdvance: 0,
+      remainingLoan: 0,
       net: 0,
     }
   );
@@ -124,21 +133,42 @@ const MonthlyRecords = ({ isDarkMode, employees }) => {
                   isDarkMode ? "text-gray-300" : "text-gray-700"
                 } uppercase`}
               >
-                Advances
+                Advance Taken
               </th>
               <th
                 className={`px-4 py-3 text-right text-xs font-semibold ${
                   isDarkMode ? "text-gray-300" : "text-gray-700"
                 } uppercase`}
               >
-                Loans
+                Loan Taken
               </th>
               <th
                 className={`px-4 py-3 text-right text-xs font-semibold ${
                   isDarkMode ? "text-gray-300" : "text-gray-700"
                 } uppercase`}
               >
-                Total Deductions
+                Advance Deducted
+              </th>
+              <th
+                className={`px-4 py-3 text-right text-xs font-semibold ${
+                  isDarkMode ? "text-gray-300" : "text-gray-700"
+                } uppercase`}
+              >
+                Loan Deducted
+              </th>
+              <th
+                className={`px-4 py-3 text-right text-xs font-semibold ${
+                  isDarkMode ? "text-gray-300" : "text-gray-700"
+                } uppercase`}
+              >
+                Remaining Adv.
+              </th>
+              <th
+                className={`px-4 py-3 text-right text-xs font-semibold ${
+                  isDarkMode ? "text-gray-300" : "text-gray-700"
+                } uppercase`}
+              >
+                Remaining Loan
               </th>
               <th
                 className={`px-4 py-3 text-right text-xs font-semibold ${
@@ -187,19 +217,28 @@ const MonthlyRecords = ({ isDarkMode, employees }) => {
                     isDarkMode ? "text-white" : "text-gray-900"
                   }`}
                 >
-                  AED {record.gross.toLocaleString()}
+                   {record.gross.toLocaleString('en-AE', { minimumFractionDigits: 2 })}
+                </td>
+                <td className="px-4 py-3 text-right text-orange-600 font-medium">
+                   {(record.totalAdvanceTaken || 0).toLocaleString('en-AE', { minimumFractionDigits: 2 })}
+                </td>
+                <td className="px-4 py-3 text-right text-purple-600 font-medium">
+                   {(record.totalLoanTaken || 0).toLocaleString('en-AE', { minimumFractionDigits: 2 })}
                 </td>
                 <td className="px-4 py-3 text-right text-red-600 font-medium">
-                  AED {record.advanceDeductions.toLocaleString()}
+                   {record.advanceDeductions.toLocaleString('en-AE', { minimumFractionDigits: 2 })}
                 </td>
                 <td className="px-4 py-3 text-right text-red-600 font-medium">
-                  AED {record.loanDeductions.toLocaleString()}
+                   {record.loanDeductions.toLocaleString('en-AE', { minimumFractionDigits: 2 })}
                 </td>
-                <td className="px-4 py-3 text-right text-red-700 font-semibold">
-                  AED {record.totalDeductions.toLocaleString()}
+                <td className="px-4 py-3 text-right text-orange-500 font-medium">
+                   {(record.remainingAdvance || 0).toLocaleString('en-AE', { minimumFractionDigits: 2 })}
+                </td>
+                <td className="px-4 py-3 text-right text-purple-500 font-medium">
+                   {(record.remainingLoan || 0).toLocaleString('en-AE', { minimumFractionDigits: 2 })}
                 </td>
                 <td className="px-4 py-3 text-right text-indigo-600 font-bold">
-                  AED {record.net.toLocaleString()}
+                   {record.net.toLocaleString('en-AE', { minimumFractionDigits: 2 })}
                 </td>
               </tr>
             ))}
@@ -221,19 +260,28 @@ const MonthlyRecords = ({ isDarkMode, employees }) => {
                   isDarkMode ? "text-white" : "text-gray-900"
                 }`}
               >
-                AED {totals.gross.toLocaleString()}
+                 {totals.gross.toLocaleString('en-AE', { minimumFractionDigits: 2 })}
+              </td>
+              <td className="px-4 py-3 text-right text-orange-600">
+                 {(totals.totalAdvanceTaken || 0).toLocaleString('en-AE', { minimumFractionDigits: 2 })}
+              </td>
+              <td className="px-4 py-3 text-right text-purple-600">
+                 {(totals.totalLoanTaken || 0).toLocaleString('en-AE', { minimumFractionDigits: 2 })}
               </td>
               <td className="px-4 py-3 text-right text-red-600">
-                AED {totals.advanceDeductions.toLocaleString()}
+                 {totals.advanceDeductions.toLocaleString('en-AE', { minimumFractionDigits: 2 })}
               </td>
               <td className="px-4 py-3 text-right text-red-600">
-                AED {totals.loanDeductions.toLocaleString()}
+                 {totals.loanDeductions.toLocaleString('en-AE', { minimumFractionDigits: 2 })}
               </td>
-              <td className="px-4 py-3 text-right text-red-700">
-                AED {totals.totalDeductions.toLocaleString()}
+              <td className="px-4 py-3 text-right text-orange-500">
+                 {(totals.remainingAdvance || 0).toLocaleString('en-AE', { minimumFractionDigits: 2 })}
+              </td>
+              <td className="px-4 py-3 text-right text-purple-500">
+                 {(totals.remainingLoan || 0).toLocaleString('en-AE', { minimumFractionDigits: 2 })}
               </td>
               <td className="px-4 py-3 text-right text-indigo-600">
-                AED {totals.net.toLocaleString()}
+                 {totals.net.toLocaleString('en-AE', { minimumFractionDigits: 2 })}
               </td>
             </tr>
           </tbody>
@@ -292,41 +340,61 @@ const MonthlyRecords = ({ isDarkMode, employees }) => {
                     isDarkMode ? "text-white" : "text-gray-900"
                   }`}
                 >
-                  AED {record.gross.toLocaleString()}
+                   {record.gross.toLocaleString('en-AE', { minimumFractionDigits: 2 })}
                 </span>
               </div>
 
               {expandedRows[record.employeeId] && (
                 <>
-                  <div className="flex justify-between">
-                    <span
-                      className={isDarkMode ? "text-gray-400" : "text-gray-600"}
-                    >
-                      Advance Deductions:
-                    </span>
-                    <span className="font-medium text-red-600">
-                      AED {record.advanceDeductions.toLocaleString()}
-                    </span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span
-                      className={isDarkMode ? "text-gray-400" : "text-gray-600"}
-                    >
-                      Loan Deductions:
-                    </span>
-                    <span className="font-medium text-red-600">
-                      AED {record.loanDeductions.toLocaleString()}
-                    </span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span
-                      className={isDarkMode ? "text-gray-400" : "text-gray-600"}
-                    >
-                      Total Deductions:
-                    </span>
-                    <span className="font-semibold text-red-700">
-                      AED {record.totalDeductions.toLocaleString()}
-                    </span>
+                  <div className="grid grid-cols-2 gap-2 mt-3">
+                    <div className="flex flex-col">
+                      <span className={isDarkMode ? "text-gray-400" : "text-gray-600"}>
+                        Advance Taken:
+                      </span>
+                      <span className="font-medium text-orange-600">
+                         {(record.totalAdvanceTaken || 0).toLocaleString('en-AE', { minimumFractionDigits: 2 })}
+                      </span>
+                    </div>
+                    <div className="flex flex-col">
+                      <span className={isDarkMode ? "text-gray-400" : "text-gray-600"}>
+                        Loan Taken:
+                      </span>
+                      <span className="font-medium text-purple-600">
+                         {(record.totalLoanTaken || 0).toLocaleString('en-AE', { minimumFractionDigits: 2 })}
+                      </span>
+                    </div>
+                    <div className="flex flex-col">
+                      <span className={isDarkMode ? "text-gray-400" : "text-gray-600"}>
+                        Advance Deducted:
+                      </span>
+                      <span className="font-medium text-red-600">
+                         {record.advanceDeductions.toLocaleString('en-AE', { minimumFractionDigits: 2 })}
+                      </span>
+                    </div>
+                    <div className="flex flex-col">
+                      <span className={isDarkMode ? "text-gray-400" : "text-gray-600"}>
+                        Loan Deducted:
+                      </span>
+                      <span className="font-medium text-red-600">
+                         {record.loanDeductions.toLocaleString('en-AE', { minimumFractionDigits: 2 })}
+                      </span>
+                    </div>
+                    <div className="flex flex-col">
+                      <span className={isDarkMode ? "text-gray-400" : "text-gray-600"}>
+                        Remaining Advance:
+                      </span>
+                      <span className="font-medium text-orange-500">
+                         {(record.remainingAdvance || 0).toLocaleString('en-AE', { minimumFractionDigits: 2 })}
+                      </span>
+                    </div>
+                    <div className="flex flex-col">
+                      <span className={isDarkMode ? "text-gray-400" : "text-gray-600"}>
+                        Remaining Loan:
+                      </span>
+                      <span className="font-medium text-purple-500">
+                         {(record.remainingLoan || 0).toLocaleString('en-AE', { minimumFractionDigits: 2 })}
+                      </span>
+                    </div>
                   </div>
                 </>
               )}
@@ -338,7 +406,7 @@ const MonthlyRecords = ({ isDarkMode, employees }) => {
               >
                 <span className="font-semibold">Net Salary:</span>
                 <span className="font-bold text-indigo-600">
-                  AED {record.net.toLocaleString()}
+                   {record.net.toLocaleString('en-AE', { minimumFractionDigits: 2 })}
                 </span>
               </div>
             </div>
@@ -362,14 +430,46 @@ const MonthlyRecords = ({ isDarkMode, employees }) => {
             <div className="flex justify-between">
               <span>Gross:</span>
               <span className="font-semibold">
-                AED {totals.gross.toLocaleString()}
+                 {totals.gross.toLocaleString('en-AE', { minimumFractionDigits: 2 })}
               </span>
             </div>
-            <div className="flex justify-between">
-              <span>Deductions:</span>
-              <span className="font-semibold text-red-600">
-                AED {totals.totalDeductions.toLocaleString()}
-              </span>
+            <div className="grid grid-cols-2 gap-2 text-xs">
+              <div className="flex justify-between">
+                <span>Adv. Taken:</span>
+                <span className="font-semibold text-orange-600">
+                   {(totals.totalAdvanceTaken || 0).toLocaleString('en-AE', { minimumFractionDigits: 2 })}
+                </span>
+              </div>
+              <div className="flex justify-between">
+                <span>Loan Taken:</span>
+                <span className="font-semibold text-purple-600">
+                   {(totals.totalLoanTaken || 0).toLocaleString('en-AE', { minimumFractionDigits: 2 })}
+                </span>
+              </div>
+              <div className="flex justify-between">
+                <span>Adv. Deducted:</span>
+                <span className="font-semibold text-red-600">
+                   {totals.advanceDeductions.toLocaleString('en-AE', { minimumFractionDigits: 2 })}
+                </span>
+              </div>
+              <div className="flex justify-between">
+                <span>Loan Deducted:</span>
+                <span className="font-semibold text-red-600">
+                   {totals.loanDeductions.toLocaleString('en-AE', { minimumFractionDigits: 2 })}
+                </span>
+              </div>
+              <div className="flex justify-between">
+                <span>Remaining Adv.:</span>
+                <span className="font-semibold text-orange-500">
+                   {(totals.remainingAdvance || 0).toLocaleString('en-AE', { minimumFractionDigits: 2 })}
+                </span>
+              </div>
+              <div className="flex justify-between">
+                <span>Remaining Loan:</span>
+                <span className="font-semibold text-purple-500">
+                   {(totals.remainingLoan || 0).toLocaleString('en-AE', { minimumFractionDigits: 2 })}
+                </span>
+              </div>
             </div>
             <div
               className={`flex justify-between pt-2 border-t ${
@@ -378,7 +478,7 @@ const MonthlyRecords = ({ isDarkMode, employees }) => {
             >
               <span className="font-bold">Net:</span>
               <span className="font-bold text-indigo-600">
-                AED {totals.net.toLocaleString()}
+                 {totals.net.toLocaleString('en-AE', { minimumFractionDigits: 2 })}
               </span>
             </div>
           </div>
@@ -387,5 +487,5 @@ const MonthlyRecords = ({ isDarkMode, employees }) => {
     </div>
   );
 };
+
 export default MonthlyRecords;
-//
